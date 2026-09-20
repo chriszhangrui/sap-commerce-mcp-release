@@ -59,9 +59,9 @@ cat << EOF
     "sap-commerce-mcp": {
       "command": "$TARGET_BIN",
       "env": {
-        "HAC_BASE_URL": "https://localhost:9002",
-        "HAC_USER": "admin",
-        "HAC_PASSWORD": "nimda"
+        "SAP_COMMERCE_URL": "https://localhost:9002",
+        "SAP_COMMERCE_USER": "admin",
+        "SAP_COMMERCE_KEY": "nimda"
       }
     }
   }

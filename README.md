@@ -16,11 +16,11 @@ This repository provides pre-compiled, self-contained standalone binary distribu
 ## 🌟 Capabilities at a Glance (33 Built-in Tools)
 
 - 🏗️ **Zero-to-One Greenfield Site Scaffolding**: Automated generation of `BaseSite`, `BaseStore`, `ProductCatalog`, CMS Catalogs, Sync Jobs, and OCC OAuth clients in seconds.
-- 🌐 **External Storefront Ingestion**: Crawl existing e-commerce storefronts (Shopify, WooCommerce, Magento) and auto-generate ready-to-import Hybris ImpEx scripts.
+- 🌐 **External Storefront Ingestion**: Crawl existing e-commerce storefronts (Shopify, WooCommerce, Magento) and auto-generate ready-to-import Commerce data scripts.
 - 🩺 **Headless Spartacus Doctor & Auto-Healing**: 12-point health check diagnosing CORS whitelist gaps, OCC URL regex mismatches, and automated remediation.
 - 🏢 **B2B Organization Governance**: Automated setup and auditing of `B2BUnit` hierarchies, `B2BCostCenter`, `B2BBudget`, and multi-tier approval permissions.
 - 🏷️ **Drools Promotion Engine Orchestration**: Code-free creation of spend thresholds, bundle rules (A+B+C), free gifts, and auto-publishing to Drools.
-- ⚡ **Direct Hybris Runtime Control**: Safe execution of FlexibleSearch queries, transactional ImpEx imports, and live Groovy scripts.
+- ⚡ **Commerce Platform Kernel Operations**: Transactional data queries, schema-driven data imports, and runtime scripting via the Commerce Kernel API.
 - 🔍 **Solr Indexing & Platform Ops**: Real-time Solr reindexing, catalog synchronization (Staged to Online), and Region Cache eviction.
 
 ---
@@ -68,9 +68,9 @@ Add the following to your `claude_desktop_config.json`:
     "sap-commerce-mcp": {
       "command": "/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp",
       "env": {
-        "HAC_BASE_URL": "https://localhost:9002",
-        "HAC_USER": "admin",
-        "HAC_PASSWORD": "nimda"
+        "SAP_COMMERCE_URL": "https://localhost:9002",
+        "SAP_COMMERCE_USER": "admin",
+        "SAP_COMMERCE_KEY": "nimda"
       }
     }
   }
@@ -83,9 +83,9 @@ Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
 * **Type**: `command`
 * **Command**: `/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp`
 * Add Environment Variables:
-  * `HAC_BASE_URL`: `https://localhost:9002`
-  * `HAC_USER`: `admin`
-  * `HAC_PASSWORD`: `nimda`
+  * `SAP_COMMERCE_URL`: `https://localhost:9002`
+  * `SAP_COMMERCE_USER`: `admin`
+  * `SAP_COMMERCE_KEY`: `nimda`
 
 ### 3. Antigravity
 Add to your Antigravity MCP settings:
@@ -94,9 +94,9 @@ Add to your Antigravity MCP settings:
   "sap-commerce-mcp": {
     "command": "/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp",
     "env": {
-      "HAC_BASE_URL": "https://localhost:9002",
-      "HAC_USER": "admin",
-      "HAC_PASSWORD": "nimda"
+      "SAP_COMMERCE_URL": "https://localhost:9002",
+      "SAP_COMMERCE_USER": "admin",
+      "SAP_COMMERCE_KEY": "nimda"
     }
   }
 }
@@ -108,10 +108,10 @@ Add to your Antigravity MCP settings:
 
 | Variable | Required | Default | Description |
 | :--- | :---: | :--- | :--- |
-| `HAC_BASE_URL` | **Yes** | `https://localhost:9002` | Target Hybris Administration Console (HAC) URL |
-| `HAC_USER` | **Yes** | `admin` | HAC administrative username |
-| `HAC_PASSWORD` | **Yes** | `nimda` | HAC administrative password |
-| `HAC_VERIFY_SSL` | No | `false` | Verify HTTPS SSL certificate (set `false` for local self-signed certs) |
+| `SAP_COMMERCE_URL` | **Yes** | `https://localhost:9002` | SAP Commerce Cloud instance endpoint URL |
+| `SAP_COMMERCE_USER` | **Yes** | `admin` | Commerce platform administrative username |
+| `SAP_COMMERCE_KEY` | **Yes** | `nimda` | Commerce platform administrative credential |
+| `SAP_COMMERCE_VERIFY_SSL` | No | `false` | Verify HTTPS SSL certificate (set `false` for local self-signed certs) |
 
 ---
 
@@ -143,9 +143,9 @@ cd ~/.sap-commerce-mcp-release && ./install.sh
     "sap-commerce-mcp": {
       "command": "/Users/<您的电脑用户名>/bin/sap-commerce-mcp",
       "env": {
-        "HAC_BASE_URL": "https://localhost:9002",
-        "HAC_USER": "admin",
-        "HAC_PASSWORD": "nimda"
+        "SAP_COMMERCE_URL": "https://localhost:9002",
+        "SAP_COMMERCE_USER": "admin",
+        "SAP_COMMERCE_KEY": "nimda"
       }
     }
   }
