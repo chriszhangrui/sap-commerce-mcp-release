@@ -43,6 +43,8 @@ cp -f "$SOURCE_BIN" "$TARGET_BIN"
 echo -e "🛡️  配置系统执行权限并清除下载隔离标记 (quarantine)..."
 chmod +x "$TARGET_BIN"
 xattr -d com.apple.quarantine "$TARGET_BIN" 2>/dev/null || true
+echo -e "✍️  正在执行本地签名以通过 macOS 内存完整性保护..."
+codesign --force --deep --sign - "$TARGET_BIN" 2>/dev/null || true
 
 echo -e "${GREEN}✅ 安装成功！${NC}\n"
 
