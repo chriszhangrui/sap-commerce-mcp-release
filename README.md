@@ -227,7 +227,3 @@ xattr -d com.apple.quarantine ~/bin/sap-commerce-mcp
 **Q: 本版本支持哪些 SAP Commerce 版本？**  
 A: 支持 SAP Commerce Cloud (CCL) 2211、2011 以及 CCv2 云端环境，兼容 Spartacus / Composable Storefront 4.x / 5.x / 6.x / 2211.x。
 
-**Q: 试用授权与技术支持**  
-A: 当前分发版本包含 60 天评估试用（有效期至 2026-11-29）。如需获取永久授权或申请定制支持，请联系作者：
-* **Author**: Chris Zhang
-* **Email**: `chris.zhang01@sap.com`
