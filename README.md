@@ -1,17 +1,23 @@
 # SAP Commerce Cloud MCP Server (`SAP-Commerce-MCP`) — Distribution Release
 
 [![Release: v3.1.0](https://img.shields.io/badge/Release-v3.1.0-blue.svg)](https://github.com/chriszhangrui/sap-commerce-mcp-release)
-[![Platform: macOS](https://img.shields.io/badge/Platform-macOS%20(Apple%20Silicon)-black.svg?logo=apple)]()
+[![macOS Apple Silicon](https://img.shields.io/badge/macOS-Apple%20Silicon%20(arm64)-black.svg?logo=apple)]()
+[![macOS Intel](https://img.shields.io/badge/macOS-Intel%20(x86__64)-black.svg?logo=apple)]()
+[![Windows](https://img.shields.io/badge/Windows-x64%20(.exe)-0078D6.svg?logo=windows)]()
 [![MCP Specification](https://img.shields.io/badge/MCP-2024--11--05-green.svg)](https://modelcontextprotocol.io/)
 [![Transports](https://img.shields.io/badge/Transports-stdio%20%7C%20streamable--http%20%7C%20sse-orange.svg)]()
 [![SAP Commerce Cloud](https://img.shields.io/badge/SAP%20Commerce%20Cloud-2211%20%7C%20CCv2-008FD3.svg)](https://help.sap.com/docs/SAP_COMMERCE_CLOUD)
-[![Build](https://img.shields.io/badge/Build-Native%20Mach--O-blue.svg)]()
+[![Build](https://img.shields.io/badge/Build-Native%20Mach--O%20%2F%20PE%20C%20Binary-blue.svg)]()
 
-[English](README.md) | [中文说明](#-中文安装与使用说明)
+[English](#-english-guide) | [中文说明](#-中文安装与使用说明)
 
-**SAP-Commerce-MCP** is an enterprise-grade Model Context Protocol (MCP) server that empowers AI assistants (**Claude Desktop, Cursor, Antigravity, VS Code Cline, SAP Joule**, etc.) to directly control, automate, scaffold, and self-heal **SAP Commerce Cloud (Hybris)** environments and **Composable Storefronts (Spartacus)**.
+---
 
-This repository provides pre-compiled, self-contained standalone binary distributions for macOS. **No Python runtime or third-party dependencies required.**
+# 📖 English Guide
+
+**SAP-Commerce-MCP** is an enterprise-grade Model Context Protocol (MCP) server that empowers AI assistants (**Claude Desktop, Cursor, Antigravity, VS Code Cline, SAP Joule**, etc.) to directly control, automate, scaffold, and self-heal **SAP Commerce Cloud** environments and **Composable Storefronts (Spartacus)**.
+
+This repository provides pre-compiled, self-contained standalone binary distributions for **macOS (Apple Silicon & Intel)** and **Windows (x64)**. **Zero Python runtime or third-party dependencies required.**
 
 ---
 
@@ -23,7 +29,7 @@ This repository provides pre-compiled, self-contained standalone binary distribu
 - 🌐 **External Storefront Ingestion & Crawling**: Ingest and structure external storefront catalogs (Shopify, WooCommerce, Magento, etc.) into ready-to-import SAP Commerce data scripts.
 - 🩺 **Headless Spartacus Doctor & Auto-Healing**: 14-point deep health check diagnosing CORS whitelists, OCC URL regex mismatches, MyAccount navigation hierarchies, TabContainer child components, and B2B approval slots.
 - 🏢 **B2B Organization Governance**: Automated setup and auditing of `B2BUnit` hierarchies, `B2BCostCenter`, `B2BBudget`, and multi-tier approval permissions.
-- 🏷️ **Drools Promotion Engine Orchestration**: Code-free creation of spend thresholds, bundle promotions (A+B+C), free gift rules, and instant publishing into Drools rule bases.
+- 🏷️ **Promotion Engine Orchestration**: Code-free creation of spend thresholds, bundle promotions (A+B+C), free gift rules, and instant publishing into promotion rule bases.
 - ⚡ **Commerce Platform Kernel Operations**: Transactional data queries, schema-driven data ingestion pipelines, and runtime execution via the Commerce Platform Kernel API.
 - 🔍 **Solr Indexing & Platform Ops**: Real-time Solr reindexing, catalog synchronization (Staged to Online), and Region Cache eviction.
 
@@ -36,18 +42,21 @@ The compiled standalone binary natively supports **both** local process executio
 ### Mode 1: Local `stdio` (Default)
 Used by desktop AI tools (Claude Desktop, Cursor, Antigravity) communicating via standard input/output.
 ```bash
-# Simply run the binary without arguments
+# macOS
 ./sap-commerce-mcp
+
+# Windows
+.\sap-commerce-mcp.exe
 ```
 
 ### Mode 2: Network HTTP Service (`streamable-http` / `sse`)
 Used for remote deployments, containers, team-shared services, or web clients like SAP Joule:
 ```bash
-# Start Streamable HTTP server on port 8080 (MCP endpoint at /mcp)
+# macOS
 ./sap-commerce-mcp --transport streamable-http --port 8080
 
-# Or using environment variables
-MCP_HTTP=true PORT=8080 ./sap-commerce-mcp
+# Windows
+.\sap-commerce-mcp.exe --transport streamable-http --port 8080
 ```
 
 Endpoints exposed in HTTP mode:
@@ -57,34 +66,44 @@ Endpoints exposed in HTTP mode:
 
 ---
 
-## 💻 Quick Start for macOS
+## 💻 Quick Start
 
-### Option 1: One-Click Automated Install (Recommended)
+### macOS (Apple Silicon & Intel)
 
-Run the following commands in your Terminal:
-
+#### Option 1: Automated Installer
 ```bash
 git clone https://github.com/chriszhangrui/sap-commerce-mcp-release.git ~/.sap-commerce-mcp-release
 cd ~/.sap-commerce-mcp-release && ./install.sh
 ```
+The script auto-detects your architecture (`arm64` or `x86_64`), installs the binary to `~/bin/sap-commerce-mcp`, configures permissions, and outputs the AI client configuration snippet.
 
-The script will automatically install the binary to `~/bin/sap-commerce-mcp`, grant execution permissions, clear the macOS quarantine attribute, and display the JSON snippet for your AI client.
+#### Option 2: Manual Installation
+1. Download `sap-commerce-mcp-macos-arm64` (Apple Silicon M1-M4) or `sap-commerce-mcp-macos-x86_64` (Intel) from Releases.
+2. Copy it to `~/bin/sap-commerce-mcp`:
+   ```bash
+   mkdir -p ~/bin
+   cp sap-commerce-mcp-macos-* ~/bin/sap-commerce-mcp
+   chmod +x ~/bin/sap-commerce-mcp
+   xattr -d com.apple.quarantine ~/bin/sap-commerce-mcp 2>/dev/null || true
+   codesign --force --deep --sign - ~/bin/sap-commerce-mcp 2>/dev/null || true
+   ```
 
 ---
 
-### Option 2: Manual Installation
+### Windows (x64)
 
-1. Clone or download this repository.
-2. Copy `bin/sap-commerce-mcp` to your preferred directory (e.g. `~/bin/`):
-   ```bash
-   mkdir -p ~/bin
-   cp bin/sap-commerce-mcp ~/bin/
-   ```
-3. Grant executable permissions and bypass macOS Gatekeeper quarantine:
-   ```bash
-   chmod +x ~/bin/sap-commerce-mcp
-   xattr -d com.apple.quarantine ~/bin/sap-commerce-mcp 2>/dev/null || true
-   ```
+#### Option 1: Automated PowerShell Installer
+Clone or download this repo, open **PowerShell**, and run:
+```powershell
+cd sap-commerce-mcp-release
+.\install.ps1
+```
+The installer copies the executable to `%USERPROFILE%\bin\sap-commerce-mcp.exe`, unblocks it, adds the directory to your user PATH, and outputs the AI client configuration.
+
+#### Option 2: Manual Installation
+1. Download `sap-commerce-mcp-windows-x64.exe` from Releases.
+2. Place it in `C:\Users\<YOUR_USERNAME>\bin\sap-commerce-mcp.exe`.
+3. Right-click the `.exe` -> **Properties** -> Check **Unblock** if downloaded from the web.
 
 ---
 
@@ -92,8 +111,10 @@ The script will automatically install the binary to `~/bin/sap-commerce-mcp`, gr
 
 ### 1. Claude Desktop (Local stdio)
 Add to your `claude_desktop_config.json`:
-* macOS Path: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
+**macOS Config:**
 ```json
 {
   "mcpServers": {
@@ -109,18 +130,35 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
+**Windows Config:**
+```json
+{
+  "mcpServers": {
+    "sap-commerce-mcp": {
+      "command": "C:\\Users\\<YOUR_USERNAME>\\bin\\sap-commerce-mcp.exe",
+      "env": {
+        "SAP_COMMERCE_URL": "https://localhost:9002",
+        "SAP_COMMERCE_USER": "admin",
+        "SAP_COMMERCE_KEY": "nimda"
+      }
+    }
+  }
+}
+```
+
 ### 2. Cursor (Local stdio)
 Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
-* **Name**: `sap-commerce-mcp`
-* **Type**: `command`
-* **Command**: `/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp`
-* Add Environment Variables:
-  * `SAP_COMMERCE_URL`: `https://localhost:9002`
-  * `SAP_COMMERCE_USER`: `admin`
-  * `SAP_COMMERCE_KEY`: `nimda`
+- **Name**: `sap-commerce-mcp`
+- **Type**: `command`
+- **Command**:
+  - macOS: `/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp`
+  - Windows: `C:\Users\<YOUR_USERNAME>\bin\sap-commerce-mcp.exe`
+- Environment Variables:
+  - `SAP_COMMERCE_URL`: `https://localhost:9002`
+  - `SAP_COMMERCE_USER`: `admin`
+  - `SAP_COMMERCE_KEY`: `nimda`
 
 ### 3. Remote / HTTP Mode (Joule, Remote Agent, Web Clients)
-If you start `sap-commerce-mcp` as an HTTP service:
 ```json
 {
   "mcpServers": {
@@ -152,39 +190,68 @@ If you start `sap-commerce-mcp` as an HTTP service:
 
 # 🇨🇳 中文安装与使用说明
 
-**SAP-Commerce-MCP** 是一款面向 SAP Commerce Cloud（Hybris）与 Composable Storefront（Spartacus）的企业级智能体 MCP 服务。
+**SAP-Commerce-MCP** 是一款面向 SAP Commerce Cloud 与 Composable Storefront（Spartacus）的企业级智能体 MCP 服务。
 
-本仓库提供针对 macOS（Apple Silicon）平台预编译的**独立单文件二进制程序**，内部已集成全部依赖，**无需配置 Python 环境或第三方包，开箱即用**。
+本仓库提供针对 **macOS（Apple Silicon & Intel）** 与 **Windows（x64）** 平台预编译的**独立单文件二进制程序**，内部已集成全部依赖，**无需配置 Python 环境或第三方包，开箱即用**。
 
 ---
 
-### 🌟 核心功能特性（v3.1.0 新增）
+### 🌟 核心功能特性（v3.1.0）
 
-1. **B2B / B2C 双模商城脚手架**：一键生成从底层数据模型、OCC 接口到 CMS 页面组件的全套配置。
-2. **CCv2 离线补丁打包器**：全自动导出包含全套版本变更脚本、自动化回滚方案、健康探测探针及 CAB 审计文档的标准 CCv2 独立发布包（ZIP）。
-3. **商品真图抓取与媒体绑定引擎**：自动化抓取品牌高清图并自动生成底层的全生命周期媒体资产绑定与映射逻辑。
-4. **双传输运行模式**：同时支持本地极速 `stdio` 管道模式与网络微服务 `streamable-http` / `sse` 模式。
-5. **Headless Spartacus Doctor 诊断增强**：覆盖 MyAccount 导航树、B2B 审批流槽位与 TabContainer 层级审计。
+1. **多平台原生支持**：提供 macOS（Apple Silicon arm64 / Intel x86_64）及 Windows（x64）原生编译二进制，开箱即用。
+2. **B2B / B2C 双模商城脚手架**：一键生成从底层数据模型、OCC 接口到 CMS 页面组件的全套配置。
+3. **CCv2 离线补丁打包器**：全自动导出包含全套版本变更脚本、自动化回滚方案、健康探测探针及 CAB 审计文档的标准 CCv2 独立发布包（ZIP）。
+4. **商品真图抓取与媒体绑定引擎**：自动化抓取品牌高清图并自动生成底层的全生命周期媒体资产绑定与映射逻辑。
+5. **双传输运行模式**：同时支持本地极速 `stdio` 管道模式与网络微服务 `streamable-http` / `sse` 模式。
+6. **Headless Spartacus Doctor 诊断增强**：覆盖 MyAccount 导航树、B2B 审批流槽位与 TabContainer 层级审计。
 
 ---
 
 ### 快速安装步骤
 
-#### 第一步：克隆仓库并执行安装脚本
-打开 Mac 终端执行：
+#### macOS (Apple Silicon & Intel)
+打开终端执行：
 ```bash
 git clone https://github.com/chriszhangrui/sap-commerce-mcp-release.git ~/.sap-commerce-mcp-release
 cd ~/.sap-commerce-mcp-release && ./install.sh
 ```
 
-#### 第二步：配置到 AI 工具
-安装脚本会自动将程序放入 `~/bin/sap-commerce-mcp`，并输出以下 JSON 配置。将其复制并添加到您的 **Claude Desktop**、**Cursor** 或 **Antigravity** 的配置文件中即可：
+#### Windows (x64)
+打开 PowerShell 执行：
+```powershell
+git clone https://github.com/chriszhangrui/sap-commerce-mcp-release.git $env:USERPROFILE\.sap-commerce-mcp-release
+cd $env:USERPROFILE\.sap-commerce-mcp-release
+.\install.ps1
+```
 
+---
+
+### 客户端配置示例
+
+将配置写入您的 **Claude Desktop**、**Cursor** 或 **Antigravity** 中：
+
+#### macOS:
 ```json
 {
   "mcpServers": {
     "sap-commerce-mcp": {
-      "command": "/Users/<您的电脑用户名>/bin/sap-commerce-mcp",
+      "command": "/Users/<您的用户名>/bin/sap-commerce-mcp",
+      "env": {
+        "SAP_COMMERCE_URL": "https://localhost:9002",
+        "SAP_COMMERCE_USER": "admin",
+        "SAP_COMMERCE_KEY": "nimda"
+      }
+    }
+  }
+}
+```
+
+#### Windows:
+```json
+{
+  "mcpServers": {
+    "sap-commerce-mcp": {
+      "command": "C:\\Users\\<您的用户名>\\bin\\sap-commerce-mcp.exe",
       "env": {
         "SAP_COMMERCE_URL": "https://localhost:9002",
         "SAP_COMMERCE_USER": "admin",
@@ -202,11 +269,11 @@ cd ~/.sap-commerce-mcp-release && ./install.sh
 如果您希望将 MCP 作为独立的常驻后台微服务运行（例如供远程团队或 SAP Joule 调用）：
 
 ```bash
-# 启动 Streamable HTTP 服务（默认端口 8080）
+# macOS
 ~/bin/sap-commerce-mcp --transport streamable-http --port 8080
 
-# 或使用环境变量启动
-MCP_HTTP=true PORT=8080 ~/bin/sap-commerce-mcp
+# Windows
+& "$env:USERPROFILE\bin\sap-commerce-mcp.exe" --transport streamable-http --port 8080
 ```
 
 微服务提供以下标准端点：
@@ -218,12 +285,15 @@ MCP_HTTP=true PORT=8080 ~/bin/sap-commerce-mcp
 
 ## ❓ 常见问题 (FAQ)
 
-**Q: 启动时提示 `"sap-commerce-mcp" 无法打开，因为无法验证开发者`？**  
-A: 这是 macOS 下载外部二进制程序的 Gatekeeper 安全机制。请在终端执行以下命令解除隔离：
+**Q: macOS 启动时提示 `"sap-commerce-mcp" 无法打开，因为无法验证开发者`？**  
+A: 这是 macOS 下载外部二进制程序的 Gatekeeper 安全机制。请在终端执行：
 ```bash
 xattr -d com.apple.quarantine ~/bin/sap-commerce-mcp
+codesign --force --deep --sign - ~/bin/sap-commerce-mcp
 ```
+
+**Q: Windows 提示 SmartScreen 拦截或未知发布者？**  
+A: 在 PowerShell 中执行 `Unblock-File -Path "$env:USERPROFILE\bin\sap-commerce-mcp.exe"` 即可解除下载保护。
 
 **Q: 本版本支持哪些 SAP Commerce 版本？**  
 A: 支持 SAP Commerce Cloud (CCL) 2211、2011 以及 CCv2 云端环境，兼容 Spartacus / Composable Storefront 4.x / 5.x / 6.x / 2211.x。
-

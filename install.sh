@@ -15,19 +15,32 @@ echo -e "${BLUE}================================================================
 echo -e "${GREEN}      🚀 安装 SAP-Commerce-MCP 独立可执行程序 (macOS)${NC}"
 echo -e "${BLUE}======================================================================${NC}"
 
-# 1. 操作系统检查
+# 1. 操作系统与 CPU 架构检查
 OS="$(uname -s)"
 ARCH="$(uname -m)"
 if [ "$OS" != "Darwin" ]; then
-  echo -e "${RED}❌ 错误: 本预编译版本仅支持 macOS (Darwin)。当前检测到: $OS${NC}"
+  echo -e "${RED}❌ 错误: 本安装脚本仅支持 macOS (Darwin)。当前检测到: $OS${NC}"
+  echo -e "${YELLOW}👉 Windows 用户请在 PowerShell 中直接运行: .\\install.ps1${NC}"
   exit 1
 fi
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-SOURCE_BIN="$SCRIPT_DIR/bin/sap-commerce-mcp"
+echo -e "🔍 检测到系统架构: ${YELLOW}macOS ($ARCH)${NC}"
 
-if [ ! -f "$SOURCE_BIN" ]; then
-  echo -e "${RED}❌ 错误: 未在 $SCRIPT_DIR/bin/ 中找到 sap-commerce-mcp 文件！${NC}"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# 自动定位匹配架构的二进制文件
+SOURCE_BIN=""
+if [ -f "$SCRIPT_DIR/bin/sap-commerce-mcp-macos-$ARCH" ]; then
+  SOURCE_BIN="$SCRIPT_DIR/bin/sap-commerce-mcp-macos-$ARCH"
+elif [ -f "$SCRIPT_DIR/sap-commerce-mcp-macos-$ARCH" ]; then
+  SOURCE_BIN="$SCRIPT_DIR/sap-commerce-mcp-macos-$ARCH"
+elif [ -f "$SCRIPT_DIR/bin/sap-commerce-mcp" ]; then
+  SOURCE_BIN="$SCRIPT_DIR/bin/sap-commerce-mcp"
+fi
+
+if [ -z "$SOURCE_BIN" ] || [ ! -f "$SOURCE_BIN" ]; then
+  echo -e "${RED}❌ 错误: 未找到适用于 macOS ($ARCH) 的独立执行文件！${NC}"
+  echo -e "请确认 $SCRIPT_DIR/bin/ 目录下存在 sap-commerce-mcp 或 sap-commerce-mcp-macos-$ARCH。"
   exit 1
 fi
 
