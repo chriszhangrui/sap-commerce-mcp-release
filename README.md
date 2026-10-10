@@ -70,12 +70,11 @@ Endpoints exposed in HTTP mode:
 
 ### macOS (Apple Silicon & Intel)
 
-#### Option 1: Automated Installer
+#### Option 1: One-line Installer (recommended)
 ```bash
-git clone https://github.com/chriszhangrui/sap-commerce-mcp-release.git ~/.sap-commerce-mcp-release
-cd ~/.sap-commerce-mcp-release && ./install.sh
+curl -fsSL https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/main/install.sh | bash
 ```
-The script auto-detects your architecture (`arm64` or `x86_64`), installs the binary to `~/bin/sap-commerce-mcp`, configures permissions, and outputs the AI client configuration snippet.
+The script downloads the latest **Apple Silicon (arm64)** binary from Releases to `~/bin/sap-commerce-mcp`, configures permissions, and outputs the AI client configuration snippet. (Intel/x86_64 Macs are not currently supported — no prebuilt binary.)
 
 #### Option 2: Manual Installation
 1. Download `sap-commerce-mcp-macos-arm64` (Apple Silicon M1-M4) or `sap-commerce-mcp-macos-x86_64` (Intel) from Releases.
@@ -92,13 +91,12 @@ The script auto-detects your architecture (`arm64` or `x86_64`), installs the bi
 
 ### Windows (x64)
 
-#### Option 1: Automated PowerShell Installer
-Clone or download this repo, open **PowerShell**, and run:
+#### Option 1: One-line PowerShell Installer (recommended)
+Open **PowerShell** and run:
 ```powershell
-cd sap-commerce-mcp-release
-.\install.ps1
+irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/main/install.ps1 | iex
 ```
-The installer copies the executable to `%USERPROFILE%\bin\sap-commerce-mcp.exe`, unblocks it, adds the directory to your user PATH, and outputs the AI client configuration.
+The installer downloads the latest `sap-commerce-mcp-windows-x64.exe` from Releases to `%USERPROFILE%\bin`, unblocks it, adds the directory to your user PATH, and outputs the AI client configuration.
 
 #### Option 2: Manual Installation
 1. Download `sap-commerce-mcp-windows-x64.exe` from Releases.
@@ -209,19 +207,16 @@ Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
 
 ### 快速安装步骤
 
-#### macOS (Apple Silicon & Intel)
+#### macOS (Apple Silicon)
 打开终端执行：
 ```bash
-git clone https://github.com/chriszhangrui/sap-commerce-mcp-release.git ~/.sap-commerce-mcp-release
-cd ~/.sap-commerce-mcp-release && ./install.sh
+curl -fsSL https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/main/install.sh | bash
 ```
 
 #### Windows (x64)
 打开 PowerShell 执行：
 ```powershell
-git clone https://github.com/chriszhangrui/sap-commerce-mcp-release.git $env:USERPROFILE\.sap-commerce-mcp-release
-cd $env:USERPROFILE\.sap-commerce-mcp-release
-.\install.ps1
+irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/main/install.ps1 | iex
 ```
 
 ---

@@ -26,33 +26,29 @@ fi
 
 echo -e "🔍 检测到系统架构: ${YELLOW}macOS ($ARCH)${NC}"
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-# 自动定位匹配架构的二进制文件
-SOURCE_BIN=""
-if [ -f "$SCRIPT_DIR/bin/sap-commerce-mcp-macos-$ARCH" ]; then
-  SOURCE_BIN="$SCRIPT_DIR/bin/sap-commerce-mcp-macos-$ARCH"
-elif [ -f "$SCRIPT_DIR/sap-commerce-mcp-macos-$ARCH" ]; then
-  SOURCE_BIN="$SCRIPT_DIR/sap-commerce-mcp-macos-$ARCH"
-elif [ -f "$SCRIPT_DIR/bin/sap-commerce-mcp" ]; then
-  SOURCE_BIN="$SCRIPT_DIR/bin/sap-commerce-mcp"
-fi
-
-if [ -z "$SOURCE_BIN" ] || [ ! -f "$SOURCE_BIN" ]; then
-  echo -e "${RED}❌ 错误: 未找到适用于 macOS ($ARCH) 的独立执行文件！${NC}"
-  echo -e "请确认 $SCRIPT_DIR/bin/ 目录下存在 sap-commerce-mcp 或 sap-commerce-mcp-macos-$ARCH。"
+# 仅支持 Apple Silicon (arm64)。Intel (x86_64) 暂无预编译二进制。
+if [ "$ARCH" != "arm64" ]; then
+  echo -e "${RED}❌ 错误: 当前仅提供 Apple Silicon (arm64) 预编译二进制，未提供 Intel (x86_64) 版本。${NC}"
+  echo -e "${YELLOW}👉 检测到架构: $ARCH。请在 Apple Silicon (M1/M2/M3/M4) Mac 上安装。${NC}"
   exit 1
 fi
 
-# 2. 目标安装路径选择
+# 2. 目标安装路径
 TARGET_DIR="$HOME/bin"
 mkdir -p "$TARGET_DIR"
 TARGET_BIN="$TARGET_DIR/sap-commerce-mcp"
 
-echo -e "📦 正在复制程序到: ${YELLOW}$TARGET_BIN${NC}..."
-cp -f "$SOURCE_BIN" "$TARGET_BIN"
+# 3. 从 GitHub Release 下载最新 arm64 二进制（latest 自动指向最新版本）
+DOWNLOAD_URL="https://github.com/chriszhangrui/sap-commerce-mcp-release/releases/latest/download/sap-commerce-mcp-macos-arm64"
+echo -e "⬇️  正在从 GitHub Release 下载最新二进制..."
+echo -e "    ${YELLOW}$DOWNLOAD_URL${NC}"
+if ! curl -fL --progress-bar -o "$TARGET_BIN" "$DOWNLOAD_URL"; then
+  echo -e "${RED}❌ 下载失败。请检查网络，或手动从 Releases 页面下载 sap-commerce-mcp-macos-arm64。${NC}"
+  echo -e "    https://github.com/chriszhangrui/sap-commerce-mcp-release/releases/latest"
+  exit 1
+fi
 
-# 3. 赋权与清除 macOS Gatekeeper 隔离属性
+# 4. 赋权与清除 macOS Gatekeeper 隔离属性
 echo -e "🛡️  配置系统执行权限并清除下载隔离标记 (quarantine)..."
 chmod +x "$TARGET_BIN"
 xattr -d com.apple.quarantine "$TARGET_BIN" 2>/dev/null || true
