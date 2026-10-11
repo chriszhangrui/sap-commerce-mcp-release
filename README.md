@@ -172,15 +172,39 @@ Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
 
 ## 🔑 Environment Variables Reference
 
-| Variable | Required | Default | Description |
-| :--- | :---: | :--- | :--- |
-| `SAP_COMMERCE_URL` | **Yes** | `https://localhost:9002` | SAP Commerce Cloud instance endpoint URL |
-| `SAP_COMMERCE_USER` | **Yes** | `admin` | Commerce platform administrative username |
-| `SAP_COMMERCE_KEY` | **Yes** | `nimda` | Commerce platform administrative credential |
-| `SAP_COMMERCE_VERIFY_SSL` | No | `false` | Verify HTTPS SSL certificate (set `false` for local self-signed certs) |
-| `MCP_TRANSPORT` | No | `stdio` | Transport protocol: `stdio`, `streamable-http`, or `sse` |
-| `MCP_PORT` / `PORT` | No | `8080` | Port to listen on when running in HTTP mode |
-| `MCP_HOST` | No | `0.0.0.0` | Host interface to bind when running in HTTP mode |
+### Required — Commerce connection (set these in your MCP client's `env`)
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `SAP_COMMERCE_URL` | `https://localhost:9002` | SAP Commerce Cloud instance endpoint URL |
+| `SAP_COMMERCE_USER` | `admin` | Commerce platform administrative username |
+| `SAP_COMMERCE_KEY` | `nimda` | Commerce platform administrative credential |
+
+> Legacy aliases `HAC_URL` / `HAC_USER` / `HAC_PASS` are still accepted as a
+> fallback if the `SAP_COMMERCE_*` ones are not set.
+
+### Optional — HTTP service mode (only when not using the default local stdio)
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `MCP_TRANSPORT` | `stdio` | Transport protocol: `stdio`, `streamable-http`, or `sse` |
+| `MCP_PORT` / `PORT` | `8080` | Port to listen on in HTTP mode |
+| `MCP_HOST` | `0.0.0.0` | Host interface to bind in HTTP mode |
+
+### Optional — advanced / situational
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `SPARTACUS_PROJECT_PATH` | `~/sap-ai-commerce-demo/spartacus-storefront` | Local path to your Spartacus storefront project. **Only needed** if you use the storefront-config / spartacus-doctor tools to edit your local frontend files (`.env-cmdrc`, `providers.ts`, `styles.scss`). Not needed for backend-only use. |
+| `HAC_STORAGE_PATH` | (auto) | Path to store the SSO session, for SAP-internal SSO environments. |
+| `MCP_SKIP_NET_TIME` | `false` | Set `true` to skip the network time check (offline / air-gapped environments). |
+
+> **Notes on things you do NOT configure at install time:**
+> - **Storefront URL** (e.g. `http://localhost:4200`) is a per-call tool argument
+>   (`storefront_origin` / `storefront_url`) with a sensible default — not an env var.
+> - **CCv2 output directory** is a per-call tool argument (`output_dir`, default under
+>   `/tmp`). The CCv2 tools *generate* extension / Java / release-patch files into that
+>   directory; you then copy them into your Commerce project repo and raise a PR — the
+>   server never deploys into Commerce itself.
+> - There is **no "Commerce server install path"** input — the server talks to Commerce
+>   over HTTP (`SAP_COMMERCE_URL`); it never reads the Commerce installation directory.
 
 ---
 
