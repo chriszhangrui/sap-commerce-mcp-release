@@ -1,6 +1,6 @@
 # SAP Commerce Cloud MCP Server (`SAP-Commerce-MCP`) — Distribution Release
 
-[![Release: v3.1.0](https://img.shields.io/badge/Release-v3.1.0-blue.svg)](https://github.com/chriszhangrui/sap-commerce-mcp-release)
+[![Latest Release](https://img.shields.io/github/v/release/chriszhangrui/sap-commerce-mcp-release?label=Release&color=blue)](https://github.com/chriszhangrui/sap-commerce-mcp-release/releases/latest)
 [![macOS Apple Silicon](https://img.shields.io/badge/macOS-Apple%20Silicon%20(arm64)-black.svg?logo=apple)]()
 [![Windows](https://img.shields.io/badge/Windows-x64%20(.exe)-0078D6.svg?logo=windows)]()
 [![MCP Specification](https://img.shields.io/badge/MCP-2024--11--05-green.svg)](https://modelcontextprotocol.io/)
@@ -20,7 +20,7 @@ This repository provides pre-compiled, self-contained standalone binary distribu
 
 ---
 
-## 🌟 Capabilities at a Glance (34+ Built-in Tools)
+## 🌟 Capabilities at a Glance (Built-in Enterprise Toolset)
 
 - 🏗️ **Dual-Mode Greenfield Site Scaffolding (B2B & B2C)**: Automated generation of `BaseSite`, `BaseStore`, `ProductCatalog`, CMS Catalogs, Sync Jobs, and OCC OAuth clients for both B2B e-commerce and B2C brand direct-to-consumer stores.
 - 📦 **CCv2 Enterprise Offline Release Packaging**: Automatically build and export complete, CAB-compliant CCv2 deployment bundles (ZIP) containing structured schema migration scripts, automated rollback plans, health verification probes, and enterprise change documentation.
@@ -217,7 +217,7 @@ Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
 
 ---
 
-### 🌟 核心功能特性（v3.1.0）
+### 🌟 核心功能特性
 
 1. **多平台原生支持**：提供 macOS（Apple Silicon / arm64）及 Windows（x64）原生编译二进制，开箱即用。
 2. **B2B / B2C 双模商城脚手架**：一键生成从底层数据模型、OCC 接口到 CMS 页面组件的全套配置。
@@ -279,6 +279,38 @@ irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/mai
   }
 }
 ```
+
+---
+
+### 🔑 环境变量参考
+
+#### 必填 —— 连接 Commerce（填入 MCP 客户端配置的 `env`）
+| 变量 | 默认值 | 说明 |
+| :--- | :--- | :--- |
+| `SAP_COMMERCE_URL` | `https://localhost:9002` | SAP Commerce Cloud 实例地址 |
+| `SAP_COMMERCE_USER` | `admin` | Commerce 平台管理员账号 |
+| `SAP_COMMERCE_KEY` | `nimda` | Commerce 平台管理员密码 |
+
+> 旧变量名 `HAC_URL` / `HAC_USER` / `HAC_PASS` 仍作为兼容回退支持（当未设置 `SAP_COMMERCE_*` 时生效）。
+
+#### 可选 —— HTTP 服务模式（仅在不使用默认本地 stdio 时需要）
+| 变量 | 默认值 | 说明 |
+| :--- | :--- | :--- |
+| `MCP_TRANSPORT` | `stdio` | 传输协议：`stdio`、`streamable-http` 或 `sse` |
+| `MCP_PORT` / `PORT` | `8080` | HTTP 模式监听端口 |
+| `MCP_HOST` | `0.0.0.0` | HTTP 模式绑定的网卡地址 |
+
+#### 可选 —— 高级 / 特定场景
+| 变量 | 默认值 | 说明 |
+| :--- | :--- | :--- |
+| `SPARTACUS_PROJECT_PATH` | `~/sap-ai-commerce-demo/spartacus-storefront` | 本机 Spartacus 前台工程目录。**仅当**你用前台配置 / spartacus-doctor 工具去修改本地前台文件（`.env-cmdrc`、`providers.ts`、`styles.scss`）时才需要；只操作后端时无需配置。 |
+| `HAC_STORAGE_PATH` | （自动） | SSO 会话存储路径，用于 SAP 内网 SSO 环境。 |
+| `MCP_SKIP_NET_TIME` | `false` | 设为 `true` 跳过联网校时（离线 / 内网隔离环境）。 |
+
+> **以下几项无需在安装时配置：**
+> - **前台地址**（如 `http://localhost:4200`）是工具的调用参数（`storefront_origin` / `storefront_url`），有默认值，不是环境变量。
+> - **CCv2 产物输出目录**是工具的调用参数（`output_dir`，默认在 `/tmp` 下）。CCv2 工具只是把生成的 extension / Java / 发布补丁文件**输出到该目录**，再由你拷进 Commerce 项目仓库提 PR —— 服务本身不会部署进 Commerce。
+> - **不存在"Commerce 服务器安装路径"这个输入** —— 服务通过 HTTP（`SAP_COMMERCE_URL`）操作 Commerce，不读取 Commerce 的本地安装目录。
 
 ---
 
