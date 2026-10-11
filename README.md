@@ -291,8 +291,6 @@ irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/mai
 | `SAP_COMMERCE_USER` | `admin` | Commerce 平台管理员账号 |
 | `SAP_COMMERCE_KEY` | `nimda` | Commerce 平台管理员密码 |
 
-> 旧变量名 `HAC_URL` / `HAC_USER` / `HAC_PASS` 仍作为兼容回退支持（当未设置 `SAP_COMMERCE_*` 时生效）。
-
 #### 可选 —— HTTP 服务模式（仅在不使用默认本地 stdio 时需要）
 | 变量 | 默认值 | 说明 |
 | :--- | :--- | :--- |
