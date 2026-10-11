@@ -2,7 +2,6 @@
 
 [![Release: v3.1.0](https://img.shields.io/badge/Release-v3.1.0-blue.svg)](https://github.com/chriszhangrui/sap-commerce-mcp-release)
 [![macOS Apple Silicon](https://img.shields.io/badge/macOS-Apple%20Silicon%20(arm64)-black.svg?logo=apple)]()
-[![macOS Intel](https://img.shields.io/badge/macOS-Intel%20(x86__64)-black.svg?logo=apple)]()
 [![Windows](https://img.shields.io/badge/Windows-x64%20(.exe)-0078D6.svg?logo=windows)]()
 [![MCP Specification](https://img.shields.io/badge/MCP-2024--11--05-green.svg)](https://modelcontextprotocol.io/)
 [![Transports](https://img.shields.io/badge/Transports-stdio%20%7C%20streamable--http%20%7C%20sse-orange.svg)]()
@@ -17,7 +16,7 @@
 
 **SAP-Commerce-MCP** is an enterprise-grade Model Context Protocol (MCP) server that empowers AI assistants (**Claude Desktop, Cursor, Antigravity, VS Code Cline, SAP Joule**, etc.) to directly control, automate, scaffold, and self-heal **SAP Commerce Cloud** environments and **Composable Storefronts (Spartacus)**.
 
-This repository provides pre-compiled, self-contained standalone binary distributions for **macOS (Apple Silicon & Intel)** and **Windows (x64)**. **Zero Python runtime or third-party dependencies required.**
+This repository provides pre-compiled, self-contained standalone binary distributions for **macOS (Apple Silicon / arm64)** and **Windows (x64)**. **Zero Python runtime or third-party dependencies required.**
 
 ---
 
@@ -68,7 +67,7 @@ Endpoints exposed in HTTP mode:
 
 ## 💻 Quick Start
 
-### macOS (Apple Silicon & Intel)
+### macOS (Apple Silicon / arm64)
 
 #### Option 1: One-line Installer (recommended)
 ```bash
@@ -77,7 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-rele
 The script downloads the latest **Apple Silicon (arm64)** binary from Releases to `~/bin/sap-commerce-mcp`, configures permissions, and outputs the AI client configuration snippet. (Intel/x86_64 Macs are not currently supported — no prebuilt binary.)
 
 #### Option 2: Manual Installation
-1. Download `sap-commerce-mcp-macos-arm64` (Apple Silicon M1-M4) or `sap-commerce-mcp-macos-x86_64` (Intel) from Releases.
+1. Download `sap-commerce-mcp-macos-arm64` (Apple Silicon, M1-M4) from Releases.
 2. Copy it to `~/bin/sap-commerce-mcp`:
    ```bash
    mkdir -p ~/bin
@@ -214,13 +213,13 @@ Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
 
 **SAP-Commerce-MCP** 是一款面向 SAP Commerce Cloud 与 Composable Storefront（Spartacus）的企业级智能体 MCP 服务。
 
-本仓库提供针对 **macOS（Apple Silicon & Intel）** 与 **Windows（x64）** 平台预编译的**独立单文件二进制程序**，内部已集成全部依赖，**无需配置 Python 环境或第三方包，开箱即用**。
+本仓库提供针对 **macOS（Apple Silicon / arm64）** 与 **Windows（x64）** 平台预编译的**独立单文件二进制程序**，内部已集成全部依赖，**无需配置 Python 环境或第三方包，开箱即用**。
 
 ---
 
 ### 🌟 核心功能特性（v3.1.0）
 
-1. **多平台原生支持**：提供 macOS（Apple Silicon arm64 / Intel x86_64）及 Windows（x64）原生编译二进制，开箱即用。
+1. **多平台原生支持**：提供 macOS（Apple Silicon / arm64）及 Windows（x64）原生编译二进制，开箱即用。
 2. **B2B / B2C 双模商城脚手架**：一键生成从底层数据模型、OCC 接口到 CMS 页面组件的全套配置。
 3. **CCv2 离线补丁打包器**：全自动导出包含全套版本变更脚本、自动化回滚方案、健康探测探针及 CAB 审计文档的标准 CCv2 独立发布包（ZIP）。
 4. **商品真图抓取与媒体绑定引擎**：自动化抓取品牌高清图并自动生成底层的全生命周期媒体资产绑定与映射逻辑。
