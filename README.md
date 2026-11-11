@@ -111,69 +111,68 @@ The installer downloads the latest `sap-commerce-mcp-windows-x64.exe` from Relea
 
 ### 🤖 1. SAP Joule (Joule for Work Desktop / Joule Studio) — [Primary Focus]
 
-**SAP Joule for Work Desktop** provides the premier enterprise experience for orchestrating SAP Commerce Cloud. Joule can directly control this MCP server either via **Local `stdio`** (direct binary execution) or **Remote `streamable-http` / `sse`** (shared microservice).
+**SAP Joule for Work Desktop** provides the premier enterprise experience for orchestrating SAP Commerce Cloud.
 
-#### A. Local `stdio` Mode (Recommended for Desktop)
-Add `sap-commerce-mcp` (and the recommended `playwright` companion) to your Joule MCP configuration file:
-- **macOS**: `~/.config/joule/mcp.json` (or Joule Settings -> MCP Servers)
-- **Windows**: `%USERPROFILE%\.config\joule\mcp.json` (or `%APPDATA%\Joule\mcp.json`)
+> [!IMPORTANT]
+> **Joule for Work Desktop requires HTTP/SSE Mode ONLY:**
+> Unlike developer CLI tools that spawn local `stdio` subprocesses, **SAP Joule for Work Desktop connects to MCP servers exclusively via network HTTP endpoints (Streamable HTTP or Server-Sent Events / SSE)**. You cannot use `command/stdio` configs with Joule. The server must be started in HTTP service mode before Joule connects.
 
-**macOS Config:**
-```json
-{
-  "mcpServers": {
-    "sap-commerce-mcp": {
-      "command": "/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp",
-      "env": {
-        "SAP_COMMERCE_URL": "https://localhost:9002",
-        "SAP_COMMERCE_USER": "admin",
-        "SAP_COMMERCE_KEY": "nimda"
-      }
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    }
-  }
-}
+#### Step 1: Start `sap-commerce-mcp` in HTTP Service Mode (Port 8080)
+
+Run the standalone binary with `--transport streamable-http --port 8080` (or `--transport sse --port 8080`):
+
+**macOS:**
+```bash
+export SAP_COMMERCE_URL="https://localhost:9002"
+export SAP_COMMERCE_USER="admin"
+export SAP_COMMERCE_KEY="nimda"
+~/bin/sap-commerce-mcp --transport streamable-http --port 8080
 ```
 
-**Windows Config:**
-```json
-{
-  "mcpServers": {
-    "sap-commerce-mcp": {
-      "command": "C:\\Users\\<YOUR_USERNAME>\\bin\\sap-commerce-mcp.exe",
-      "env": {
-        "SAP_COMMERCE_URL": "https://localhost:9002",
-        "SAP_COMMERCE_USER": "admin",
-        "SAP_COMMERCE_KEY": "nimda"
-      }
-    },
-    "playwright": {
-      "command": "cmd.exe",
-      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"]
-    }
-  }
-}
+**Windows (PowerShell):**
+```powershell
+$env:SAP_COMMERCE_URL="https://localhost:9002"
+$env:SAP_COMMERCE_USER="admin"
+$env:SAP_COMMERCE_KEY="nimda"
+& "$env:USERPROFILE\bin\sap-commerce-mcp.exe" --transport streamable-http --port 8080
 ```
 
-#### B. Remote / Microservice Mode (`streamable-http` / `sse`)
-If running `sap-commerce-mcp` as a team microservice on an internal VM or server (`./sap-commerce-mcp --transport streamable-http --port 8080`):
+> **Microservice Endpoints Exposed:**
+> - Streamable HTTP: `http://localhost:8080/mcp`
+> - SSE Protocol: `http://localhost:8080/sse`
+> - Health Check: `http://localhost:8080/health`
+
+#### Step 2: Start Playwright MCP in SSE Mode (Port 8931)
+
+For anti-bot bypass, SPA dynamic hydration, and brand color discovery, start the companion Playwright MCP in SSE mode:
+
+```bash
+# macOS & Windows:
+npx -y @playwright/mcp@latest --port 8931
+```
+*(Playwright MCP listens on `http://localhost:8931/sse`)*
+
+#### Step 3: Configure Joule for Work Desktop
+
+In **Joule for Work Desktop**, navigate to **Settings** -> **MCP Servers** -> **Add MCP Server** (or edit your Joule MCP configuration file):
+
+**Configuration for Joule Desktop:**
 ```json
 {
   "mcpServers": {
     "sap-commerce-mcp": {
-      "url": "http://<YOUR_HOST_OR_IP>:8080/mcp",
+      "url": "http://localhost:8080/mcp",
       "transport": "streamable-http"
     },
     "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
+      "url": "http://localhost:8931/sse",
+      "transport": "sse"
     }
   }
 }
 ```
+
+*(If your Joule version uses standard SSE for both, set `"url": "http://localhost:8080/sse"` and `"transport": "sse"` for `sap-commerce-mcp`).*
 
 ---
 
@@ -398,69 +397,68 @@ irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/mai
 
 #### 🤖 1. SAP Joule (Joule for Work Desktop / Joule 工作台) —— [官方首选推荐]
 
-**SAP Joule for Work Desktop** 是操控 SAP Commerce Cloud 的官方企业级首选客户端。Joule 可通过 **本地 `stdio`（直接拉起二进制程序）** 或 **远程 `streamable-http` / `sse`（团队常驻微服务）** 两种方式无缝连接 MCP 服务。
+**SAP Joule for Work Desktop** 是操控 SAP Commerce Cloud 的官方企业级首选客户端。
 
-##### 方式 A：本地 stdio 模式（桌面端推荐）
-将 `sap-commerce-mcp` 及推荐的 `playwright` 配置写入 Joule MCP 配置文件中：
-- **macOS**: `~/.config/joule/mcp.json`（或在 Joule 设置界面中选择添加 MCP 服务）
-- **Windows**: `%USERPROFILE%\.config\joule\mcp.json`（或 `%APPDATA%\Joule\mcp.json`）
+> [!IMPORTANT]
+> **Joule for Work Desktop 仅支持网络 HTTP/SSE 模式接入：**  
+> 与部分开发者 CLI 工具通过本地 `stdio` 子进程直接拉起命令不同，**SAP Joule for Work Desktop 对外连接 MCP 服务仅支持网络 HTTP 协议端点（Streamable HTTP 或 Server-Sent Events / SSE）**。Joule 桌面端中不能配置 `command/stdio` 本地进程命令，必须先将服务以 HTTP 微服务模式启动，再在 Joule 中接入其 URL 端点。
 
-**macOS 配置示例：**
-```json
-{
-  "mcpServers": {
-    "sap-commerce-mcp": {
-      "command": "/Users/<您的用户名>/bin/sap-commerce-mcp",
-      "env": {
-        "SAP_COMMERCE_URL": "https://localhost:9002",
-        "SAP_COMMERCE_USER": "admin",
-        "SAP_COMMERCE_KEY": "nimda"
-      }
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    }
-  }
-}
+##### 步骤 1：启动 `sap-commerce-mcp` HTTP 微服务（端口 8080）
+
+使用 `--transport streamable-http --port 8080`（或 `--transport sse --port 8080`）启动独立二进制程序：
+
+**macOS:**
+```bash
+export SAP_COMMERCE_URL="https://localhost:9002"
+export SAP_COMMERCE_USER="admin"
+export SAP_COMMERCE_KEY="nimda"
+~/bin/sap-commerce-mcp --transport streamable-http --port 8080
 ```
 
-**Windows 配置示例：**
-```json
-{
-  "mcpServers": {
-    "sap-commerce-mcp": {
-      "command": "C:\\Users\\<您的用户名>\\bin\\sap-commerce-mcp.exe",
-      "env": {
-        "SAP_COMMERCE_URL": "https://localhost:9002",
-        "SAP_COMMERCE_USER": "admin",
-        "SAP_COMMERCE_KEY": "nimda"
-      }
-    },
-    "playwright": {
-      "command": "cmd.exe",
-      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"]
-    }
-  }
-}
+**Windows (PowerShell):**
+```powershell
+$env:SAP_COMMERCE_URL="https://localhost:9002"
+$env:SAP_COMMERCE_USER="admin"
+$env:SAP_COMMERCE_KEY="nimda"
+& "$env:USERPROFILE\bin\sap-commerce-mcp.exe" --transport streamable-http --port 8080
 ```
 
-##### 方式 B：远程 / 团队微服务模式（`streamable-http` / `sse`）
-若在团队公共服务器或内网虚机以后台微服务方式运行（`./sap-commerce-mcp --transport streamable-http --port 8080`）：
+> **微服务暴露的核心端点：**
+> - Streamable HTTP 协议端点：`http://localhost:8080/mcp`
+> - SSE 协议端点：`http://localhost:8080/sse`
+> - 健康检查端点：`http://localhost:8080/health`
+
+##### 步骤 2：启动 Playwright MCP SSE 服务（端口 8931）
+
+为了实现反爬穿透、SPA 客户端动态注水以及品牌官网计算样式探测，请以 SSE 模式启动核心搭档 Playwright MCP：
+
+```bash
+# macOS & Windows:
+npx -y @playwright/mcp@latest --port 8931
+```
+*(Playwright MCP 将监听并暴露 `http://localhost:8931/sse`)*
+
+##### 步骤 3：在 Joule for Work Desktop 中添加服务连接
+
+在 **Joule for Work Desktop** 中，进入 **Settings**（设置）-> **MCP Servers** -> **Add MCP Server**（添加 MCP 服务），或者直接配置 Joule 的 MCP 配置文件：
+
+**Joule 桌面端配置示例：**
 ```json
 {
   "mcpServers": {
     "sap-commerce-mcp": {
-      "url": "http://<服务器IP或域名>:8080/mcp",
+      "url": "http://localhost:8080/mcp",
       "transport": "streamable-http"
     },
     "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
+      "url": "http://localhost:8931/sse",
+      "transport": "sse"
     }
   }
 }
 ```
+
+*(若您所使用的 Joule 版本仅支持标准 SSE，可将 `sap-commerce-mcp` 的 `url` 设为 `http://localhost:8080/sse`，`transport` 设为 `sse`。若在 Joule 图形界面中添加，直接在 Server URL 输入框中分别填入 `http://localhost:8080/mcp` 与 `http://localhost:8931/sse` 即可。)*
 
 ---
 
