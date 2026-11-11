@@ -142,17 +142,7 @@ $env:SAP_COMMERCE_KEY="nimda"
 > - SSE Protocol: `http://localhost:8080/sse`
 > - Health Check: `http://localhost:8080/health`
 
-#### Step 2: Start Playwright MCP in SSE Mode (Port 8931)
-
-For anti-bot bypass, SPA dynamic hydration, and brand color discovery, start the companion Playwright MCP in SSE mode:
-
-```bash
-# macOS & Windows:
-npx -y @playwright/mcp@latest --port 8931
-```
-*(Playwright MCP listens on `http://localhost:8931/sse`)*
-
-#### Step 3: Configure Joule for Work Desktop
+#### Step 2: Configure Joule for Work Desktop
 
 In **Joule for Work Desktop**, navigate to **Settings** -> **MCP Servers** -> **Add MCP Server** (or edit your Joule MCP configuration file):
 
@@ -163,16 +153,12 @@ In **Joule for Work Desktop**, navigate to **Settings** -> **MCP Servers** -> **
     "sap-commerce-mcp": {
       "url": "http://localhost:8080/mcp",
       "transport": "streamable-http"
-    },
-    "playwright": {
-      "url": "http://localhost:8931/sse",
-      "transport": "sse"
     }
   }
 }
 ```
 
-*(If your Joule version uses standard SSE for both, set `"url": "http://localhost:8080/sse"` and `"transport": "sse"` for `sap-commerce-mcp`).*
+*(If your Joule version uses standard SSE, set `"url": "http://localhost:8080/sse"` and `"transport": "sse"`. If adding via the Joule UI, simply enter `http://localhost:8080/mcp` into the Server URL field).*
 
 ---
 
@@ -428,17 +414,7 @@ $env:SAP_COMMERCE_KEY="nimda"
 > - SSE 协议端点：`http://localhost:8080/sse`
 > - 健康检查端点：`http://localhost:8080/health`
 
-##### 步骤 2：启动 Playwright MCP SSE 服务（端口 8931）
-
-为了实现反爬穿透、SPA 客户端动态注水以及品牌官网计算样式探测，请以 SSE 模式启动核心搭档 Playwright MCP：
-
-```bash
-# macOS & Windows:
-npx -y @playwright/mcp@latest --port 8931
-```
-*(Playwright MCP 将监听并暴露 `http://localhost:8931/sse`)*
-
-##### 步骤 3：在 Joule for Work Desktop 中添加服务连接
+##### 步骤 2：在 Joule for Work Desktop 中添加服务连接
 
 在 **Joule for Work Desktop** 中，进入 **Settings**（设置）-> **MCP Servers** -> **Add MCP Server**（添加 MCP 服务），或者直接配置 Joule 的 MCP 配置文件：
 
@@ -449,16 +425,12 @@ npx -y @playwright/mcp@latest --port 8931
     "sap-commerce-mcp": {
       "url": "http://localhost:8080/mcp",
       "transport": "streamable-http"
-    },
-    "playwright": {
-      "url": "http://localhost:8931/sse",
-      "transport": "sse"
     }
   }
 }
 ```
 
-*(若您所使用的 Joule 版本仅支持标准 SSE，可将 `sap-commerce-mcp` 的 `url` 设为 `http://localhost:8080/sse`，`transport` 设为 `sse`。若在 Joule 图形界面中添加，直接在 Server URL 输入框中分别填入 `http://localhost:8080/mcp` 与 `http://localhost:8931/sse` 即可。)*
+*(若您所使用的 Joule 版本使用标准 SSE，可将 `sap-commerce-mcp` 的 `url` 设为 `http://localhost:8080/sse`，`transport` 设为 `sse`。若在 Joule 图形界面中添加，直接在 Server URL 输入框中填入 `http://localhost:8080/mcp` 即可。)*
 
 ---
 
