@@ -14,9 +14,12 @@
 
 # 📖 English Guide
 
-**SAP-Commerce-MCP** is an enterprise-grade Model Context Protocol (MCP) server that empowers AI assistants (**Claude Desktop, Cursor, Antigravity, VS Code Cline, SAP Joule**, etc.) to directly control, automate, scaffold, and self-heal **SAP Commerce Cloud** environments and **Composable Storefronts (Spartacus)**.
+**SAP-Commerce-MCP** is an enterprise-grade Model Context Protocol (MCP) server that empowers **SAP Joule (Joule for Work Desktop / Joule Studio)**, **Claude Desktop**, **Cursor**, **Antigravity**, and enterprise AI agents to directly control, automate, scaffold, and self-heal **SAP Commerce Cloud** environments and **Composable Storefronts (Spartacus)**.
 
 This repository provides pre-compiled, self-contained standalone binary distributions for **macOS (Apple Silicon / arm64)** and **Windows (x64)**. **Zero Python runtime or third-party dependencies required.**
+
+> [!TIP]
+> **Recommended Companion MCP:** For 0-to-1 brand storefront scaffolding and modern website ingestion (e.g., Anker, Nike, Allbirds), we strongly recommend installing **Playwright MCP** alongside `sap-commerce-mcp`. Playwright gives your AI agent a real browser engine to bypass Cloudflare/DataDome anti-bot challenges and capture high-resolution product images directly from live DOMs. See [Playwright MCP Setup](#-2-recommended-companion-playwright-mcp-anti-bot-bypass--dynamic-spa-ingestion).
 
 ---
 
@@ -106,10 +109,14 @@ The installer downloads the latest `sap-commerce-mcp-windows-x64.exe` from Relea
 
 ## ⚙️ AI Client Configuration
 
-### 1. Claude Desktop (Local stdio)
-Add to your `claude_desktop_config.json`:
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+### 🤖 1. SAP Joule (Joule for Work Desktop / Joule Studio) — [Primary Focus]
+
+**SAP Joule for Work Desktop** provides the premier enterprise experience for orchestrating SAP Commerce Cloud. Joule can directly control this MCP server either via **Local `stdio`** (direct binary execution) or **Remote `streamable-http` / `sse`** (shared microservice).
+
+#### A. Local `stdio` Mode (Recommended for Desktop)
+Add `sap-commerce-mcp` (and the recommended `playwright` companion) to your Joule MCP configuration file:
+- **macOS**: `~/.config/joule/mcp.json` (or Joule Settings -> MCP Servers)
+- **Windows**: `%USERPROFILE%\.config\joule\mcp.json` (or `%APPDATA%\Joule\mcp.json`)
 
 **macOS Config:**
 ```json
@@ -122,6 +129,10 @@ Add to your `claude_desktop_config.json`:
         "SAP_COMMERCE_USER": "admin",
         "SAP_COMMERCE_KEY": "nimda"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
     }
   }
 }
@@ -138,34 +149,96 @@ Add to your `claude_desktop_config.json`:
         "SAP_COMMERCE_USER": "admin",
         "SAP_COMMERCE_KEY": "nimda"
       }
+    },
+    "playwright": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"]
     }
   }
 }
 ```
 
-### 2. Cursor (Local stdio)
-Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
-- **Name**: `sap-commerce-mcp`
-- **Type**: `command`
-- **Command**:
-  - macOS: `/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp`
-  - Windows: `C:\Users\<YOUR_USERNAME>\bin\sap-commerce-mcp.exe`
-- Environment Variables:
-  - `SAP_COMMERCE_URL`: `https://localhost:9002`
-  - `SAP_COMMERCE_USER`: `admin`
-  - `SAP_COMMERCE_KEY`: `nimda`
-
-### 3. Remote / HTTP Mode (Joule, Remote Agent, Web Clients)
+#### B. Remote / Microservice Mode (`streamable-http` / `sse`)
+If running `sap-commerce-mcp` as a team microservice on an internal VM or server (`./sap-commerce-mcp --transport streamable-http --port 8080`):
 ```json
 {
   "mcpServers": {
     "sap-commerce-mcp": {
       "url": "http://<YOUR_HOST_OR_IP>:8080/mcp",
       "transport": "streamable-http"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
     }
   }
 }
 ```
+
+---
+
+### 🎭 2. Recommended Companion: Playwright MCP (Anti-Bot Bypass & Dynamic SPA Ingestion)
+
+When building storefronts from existing brand websites (e.g., Anker, Nike, Allbirds), we **strongly recommend installing Playwright MCP (`@playwright/mcp`) alongside `sap-commerce-mcp`**.
+
+#### Why You Need Playwright MCP:
+1. **🛡️ Bypass Strict Anti-Bot & WAF Protections**: Modern e-commerce sites are protected by Cloudflare Turnstile, DataDome, Akamai Bot Manager, PerimeterX, and AWS WAF. Standard HTTP scrapers (`requests`, `curl`) are blocked with HTTP 403 or interactive CAPTCHAs. Playwright provides a full Chromium browser engine with real TLS fingerprints and human interaction capabilities to bypass these barriers seamlessly.
+2. **⚡ Ingest Dynamic Client-Side SPAs (Next.js / React / Nuxt)**: Leading DTC brands use headless frontends where HTML contains empty product shells until hydrated by client-side JavaScript. Playwright waits for full hydration and extracts the live, fully rendered DOM (`outerHTML`).
+3. **🎨 Automated Brand Visual Identity Discovery**: The MCP automatically calls Playwright to inspect `window.getComputedStyle()`, discovering brand primary colors (e.g., Anker Cyan, AusPost Red), secondary accents, typography, and logo assets. This ensures the scaffolded Spartacus storefront matches the brand's visual identity pixel-for-pixel.
+4. **🖼️ In-Memory Canvas Asset Capture (No Hotlink Blocks)**: Avoids CDN 403 Forbidden errors by capturing product images directly off the rendered browser canvas as Base64 binaries, writing them permanently into Hybris local storage (`sys_master`).
+5. **🩺 End-to-End Storefront Verification**: Enables Joule to perform automated acceptance testing on the generated Spartacus frontend: navigating categories, verifying PDP Specs tabs, checking in-stock ATP statuses, and adding items to cart.
+
+#### Quick Playwright MCP Setup:
+```bash
+# Verify npx is available (comes with Node.js 18+)
+npx -y @playwright/mcp@latest --version
+```
+Add the `"playwright"` server block shown in the configuration snippets above.
+
+---
+
+### 3. Claude Desktop (Local stdio)
+Add to your `claude_desktop_config.json`:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "sap-commerce-mcp": {
+      "command": "/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp",
+      "env": {
+        "SAP_COMMERCE_URL": "https://localhost:9002",
+        "SAP_COMMERCE_USER": "admin",
+        "SAP_COMMERCE_KEY": "nimda"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}
+```
+
+---
+
+### 4. Cursor (Local stdio)
+Go to **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**:
+- **Name**: `sap-commerce-mcp`
+- **Type**: `command`
+- **Command**: `/Users/<YOUR_USERNAME>/bin/sap-commerce-mcp` (or Windows `.exe` path)
+- **Environment Variables**:
+  - `SAP_COMMERCE_URL`: `https://localhost:9002`
+  - `SAP_COMMERCE_USER`: `admin`
+  - `SAP_COMMERCE_KEY`: `nimda`
+
+*(Repeat to add `playwright` with command `npx` and args `["-y", "@playwright/mcp@latest"]`)*
+
+---
+
+### 5. Antigravity & Other MCP Clients
+Add both servers to your `mcp_settings.json` or workspace settings using the JSON snippets above.
 
 ---
 
@@ -285,9 +358,12 @@ When you prompt the AI to build an e-commerce storefront from scratch, it execut
 
 # 🇨🇳 中文安装与使用说明
 
-**SAP-Commerce-MCP** 是一款面向 SAP Commerce Cloud 与 Composable Storefront（Spartacus）的企业级智能体 MCP 服务。
+**SAP-Commerce-MCP** 是一款专为 **SAP Joule（Joule for Work Desktop / 桌面工作台）**、**Claude Desktop**、**Cursor**、**Antigravity** 等企业级智能体打造的 Model Context Protocol (MCP) 服务。赋能 AI 直接操控、自动化交付、一键建站与自愈修复 **SAP Commerce Cloud** 环境与 **Composable Storefront (Spartacus)** 前台。
 
 本仓库提供针对 **macOS（Apple Silicon / arm64）** 与 **Windows（x64）** 平台预编译的**独立单文件二进制程序**，内部已集成全部依赖，**无需配置 Python 环境或第三方包，开箱即用**。
+
+> [!TIP]
+> **最佳实践与核心搭档：** 强烈建议将 **Playwright MCP** 与 `sap-commerce-mcp` **同时安装使用**。在面对 Anker、Nike、Allbirds 等现代商业独立站的反爬防护（Cloudflare、DataDome）与 SPA 客户端动态注水时，Playwright 能够提供真实浏览器环境绕过人机挑战，并抓取高清原图供 Commerce 直接入库。详见 [Playwright MCP 协同安装说明](#-2-强烈建议协同安装playwright-mcp反爬穿透与动态渲染核心搭档)。
 
 ---
 
@@ -318,11 +394,18 @@ irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/mai
 
 ---
 
-### 客户端配置示例
+### ⚙️ AI 客户端配置指南
 
-将配置写入您的 **Claude Desktop**、**Cursor** 或 **Antigravity** 中：
+#### 🤖 1. SAP Joule (Joule for Work Desktop / Joule 工作台) —— [官方首选推荐]
 
-#### macOS:
+**SAP Joule for Work Desktop** 是操控 SAP Commerce Cloud 的官方企业级首选客户端。Joule 可通过 **本地 `stdio`（直接拉起二进制程序）** 或 **远程 `streamable-http` / `sse`（团队常驻微服务）** 两种方式无缝连接 MCP 服务。
+
+##### 方式 A：本地 stdio 模式（桌面端推荐）
+将 `sap-commerce-mcp` 及推荐的 `playwright` 配置写入 Joule MCP 配置文件中：
+- **macOS**: `~/.config/joule/mcp.json`（或在 Joule 设置界面中选择添加 MCP 服务）
+- **Windows**: `%USERPROFILE%\.config\joule\mcp.json`（或 `%APPDATA%\Joule\mcp.json`）
+
+**macOS 配置示例：**
 ```json
 {
   "mcpServers": {
@@ -333,12 +416,16 @@ irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/mai
         "SAP_COMMERCE_USER": "admin",
         "SAP_COMMERCE_KEY": "nimda"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
     }
   }
 }
 ```
 
-#### Windows:
+**Windows 配置示例：**
 ```json
 {
   "mcpServers": {
@@ -349,10 +436,74 @@ irm https://raw.githubusercontent.com/chriszhangrui/sap-commerce-mcp-release/mai
         "SAP_COMMERCE_USER": "admin",
         "SAP_COMMERCE_KEY": "nimda"
       }
+    },
+    "playwright": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"]
     }
   }
 }
 ```
+
+##### 方式 B：远程 / 团队微服务模式（`streamable-http` / `sse`）
+若在团队公共服务器或内网虚机以后台微服务方式运行（`./sap-commerce-mcp --transport streamable-http --port 8080`）：
+```json
+{
+  "mcpServers": {
+    "sap-commerce-mcp": {
+      "url": "http://<服务器IP或域名>:8080/mcp",
+      "transport": "streamable-http"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}
+```
+
+---
+
+#### 🎭 2. 强烈建议协同安装：Playwright MCP（反爬穿透与动态渲染核心搭档）
+
+在要求 AI 基于已有真实商业品牌独立站（如 Anker、Nike、Allbirds 等）进行从 0 到 1 快速建站与主数据抓取时，**强烈建议同时配置安装 Playwright MCP (`@playwright/mcp`)**。
+
+##### 为什么必须搭配安装 Playwright MCP？
+1. **🛡️ 突破严苛反爬机制与人机验证（WAF / Anti-Bot Bypass）**：现代知名独立站广泛部署了 Cloudflare Turnstile、DataDome、Akamai、PerimeterX 与 AWS WAF。纯静态的 HTTP 脚本（`requests`/`curl`）极易被拦截返回 403 阻断或强制滑块。Playwright 提供真实 Chromium 浏览器内核与人机特征模拟，确保 Joule 能够 100% 顺畅穿透防护。
+2. **⚡ 深度解析客户端动态注水 SPA（Next.js / Nuxt / React Hydration）**：大量前沿 DTC 品牌采用前端无头技术栈，初始返回的 HTML 仅包含空壳框架，商品列表与属性由客户端 JavaScript 异步渲染。Playwright 能够等待页面完全 Hydrate（注水完成）后，精准截获包含全部真实参数与规格的实时 DOM（`outerHTML`）。
+3. **🎨 自动提取品牌主视觉与计算样式（Brand Visual Identity）**：建站引擎会自动驱动 Playwright 探测目标品牌的真实 Computed Styles（`window.getComputedStyle`），精准提取品牌主色调（如 Anker 极光蓝、AusPost 邮政红）、强调色与全局字体排版，让一键生成的 Spartacus 商城前台在视觉上与品牌官网像素级同步。
+4. **🖼️ 内存级 Canvas 高清图捕获（杜绝跨域 403 裂图）**：现代品牌 CDN 开启了防盗链（Hotlink Protection），直接引用外部图片链接会在前台导致 403 裂图（显示相机斜杠占位符）。Playwright 能够在浏览器内部把商品实拍图绘制到 Canvas 转换为 Base64 本地二进制，由 MCP 存入 Commerce 底层媒体中心（`sys_master`），永不裂图。
+5. **🩺 前台端到端交互与验收验证（E2E Storefront Verification）**：赋能 Joule 在建站交付后，直接模拟真实买家打开前台（`https://localhost:4201`）、浏览分类列表、展开 PDP 详情页查看 Specs 规格参数、核验在库状态（In Stock）并点击加车，完成全链路质量闭环。
+
+##### 快速检验与就绪命令：
+```bash
+# 验证 Node.js 环境及 npx 可用性
+npx -y @playwright/mcp@latest --version
+```
+
+---
+
+#### 3. Claude Desktop (本地 stdio 模式)
+在 `claude_desktop_config.json` 中添加上述双服务配置：
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+---
+
+#### 4. Cursor (本地 stdio 模式)
+前往 **Cursor Settings** -> **Features** -> **MCP** -> **Add New MCP Server**：
+- **Name**: `sap-commerce-mcp`
+- **Command**: `/Users/<您的用户名>/bin/sap-commerce-mcp`（或 Windows `.exe` 路径）
+- **Environment Variables**:
+  - `SAP_COMMERCE_URL`: `https://localhost:9002`
+  - `SAP_COMMERCE_USER`: `admin`
+  - `SAP_COMMERCE_KEY`: `nimda`
+*(建议同理添加 `playwright` 服务)*
+
+---
+
+#### 5. Antigravity & 其他智能体
+在工作区或全局的 `mcp_settings.json` 中填入上述包含 `sap-commerce-mcp` 和 `playwright` 的 JSON 块即可。
 
 ---
 
